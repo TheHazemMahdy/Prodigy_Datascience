@@ -1,0 +1,84 @@
+install.packages("readxl")
+install.packages("dplyr")
+install.packages("tidyr")
+install.packages("ggplot2")
+install.packages("flexdashboard")
+library(flexdashboard)
+library("ggplot2")
+library("tidyr")
+library("dplyr")
+library("readxl")
+
+
+total_population = read_xls("C:\\Users\\hazem\\Downloads\\API_SP.POP.TOTL_DS2_en_excel_v2_313550.xls")
+male_total = read_xls("C:\\Users\\hazem\\Downloads\\API_SP.POP.TOTL.MA.IN_DS2_en_excel_v2_258436.xls")
+female_total = read_xls("C:\\Users\\hazem\\Downloads\\API_SP.POP.TOTL.FE.IN_DS2_en_excel_v2_304298.xls")
+
+
+# Organizing Data
+
+total_population <- total_population[-c(1, 2), ]
+colnames(total_population) <- as.character(unlist(total_population[1, ]))
+total_population <- total_population[-1, ]
+
+male_total <- male_total[-c(1, 2), ]
+colnames(male_total) <- as.character(unlist(male_total[1, ]))
+male_total <- male_total[-1, ]
+
+female_total <- female_total[-c(1, 2), ]
+colnames(female_total) <- as.character(unlist(female_total[1, ]))
+female_total <- female_total[-1, ]
+
+# Filtering countries to Egypt only
+
+total_population = total_population %>% filter(`Country Code` == "EGY")
+male_total = male_total %>% filter(`Country Code` == "EGY")
+female_total = female_total %>% filter(`Country Code` == "EGY")
+
+
+# Reshaping the years columns
+
+total_population <- total_population %>%
+  pivot_longer(
+    cols = matches("^\\d{4}$"),
+    names_to = "years",
+    values_to = "Total population"
+  )
+
+
+male_total <- male_total %>%
+  pivot_longer(
+    cols = matches("^\\d{4}$"),
+    names_to = "years",
+    values_to = "Male population"
+  )
+
+female_total <- female_total %>%
+  pivot_longer(
+    cols = matches("^\\d{4}$"),
+    names_to = "years",
+    values_to = "Female population"
+  )
+
+
+# Merging the datasets
+
+data_list <- list(total_population, male_total, female_total)
+gender_distribution <- Reduce(function(x, y) merge(x, y, by = c("Country Name", "Country Code", "years"), all = TRUE), data_list)
+
+# Making data ready for the visualization
+
+gender_distribution$`Male population` = as.numeric(gender_distribution$`Male population`)
+gender_distribution$`Female population` = as.numeric(gender_distribution$`Female population`)
+
+data_matrix <- as.matrix(gender_distribution[, c("Male population", "Female population")])
+rownames(data_matrix) <- gender_distribution$years
+
+options(scipen = 999)
+
+
+# Visualization
+
+barplot(t(data_matrix), beside = TRUE, col = c("blue", "pink"),
+        legend.text = c("Male", "Female"), args.legend = list(x = "topleft"),
+        main = "Gender Distribution Over Years in Egypt", xlab = "Years", ylab = "Population")
