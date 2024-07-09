@@ -1,0 +1,80 @@
+install.packages("readr")
+install.packages(dplyr)
+install.packages(tidyr)
+install.packages("ggplot2")
+library(ggplot2)
+library("readr")
+library(dplyr)
+library(tidyr)
+
+
+
+data = read.csv("C:\\Users\\hazem\\OneDrive\\Documents\\US_Accidents_March23.csv\\US_Accidents_March23.csv")
+
+options(scipen = 999)
+
+weather_table <- table(data$Weather_Condition)
+
+weather_df <- as.data.frame(weather_table)
+colnames(weather_df) <- c("Weather", "Frequency")
+
+
+weather_df$Weather <- as.character(weather_df$Weather)
+weather_df$Weather[weather_df$Weather == ""] <- "unknown"
+
+
+top_weather_df <- weather_df %>%
+  arrange(desc(Frequency)) %>%
+  head(10)
+
+
+ggplot(top_weather_df, aes(x = reorder(Weather, -Frequency), y = Frequency)) +
+  geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+  labs(title = "Top 10 Most Frequent Weather Conditions",
+       x = "Weather",
+       y = "Frequency") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+Sunrise_Sunset_table <- table(data$Sunrise_Sunset)
+
+Sunrise_Sunset_df <- as.data.frame(Sunrise_Sunset_table)
+colnames(Sunrise_Sunset_df) <- c("Sunrise_Sunset", "Frequency")
+
+
+Sunrise_Sunset_df$Sunrise_Sunset <- as.character(Sunrise_Sunset_df$Sunrise_Sunset)
+Sunrise_Sunset_df$Sunrise_Sunset[Sunrise_Sunset_df$Sunrise_Sunset == ""] <- "unknown"
+
+
+ggplot(Sunrise_Sunset_df, aes(x = reorder(Sunrise_Sunset, -Frequency), y = Frequency)) +
+  geom_bar(stat = "identity", fill = "yellow", color = "black") +
+  labs(title = "Time of the day according to Sunrise and Sunset",
+       x = "Sunrise Sunset",
+       y = "Frequency") +
+  theme_minimal()
+
+
+City_table <- table(data$City)
+
+City_df <- as.data.frame(City_table)
+colnames(City_df) <- c("City", "Frequency")
+
+
+City_df$City <- as.character(City_df$City)
+City_df$City[City_df$City == ""] <- "unknown"
+
+
+top_City_df <- City_df %>%
+  arrange(desc(Frequency)) %>%
+  head(10)
+
+
+ggplot(top_City_df, aes(x = reorder(City, -Frequency), y = Frequency)) +
+  geom_bar(stat = "identity", fill = "green2", color = "black") +
+  labs(title = "Top 10 Most Frequent Cities",
+       x = "City",
+       y = "Frequency") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
