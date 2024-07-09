@@ -1,0 +1,33 @@
+install.packages("readr")
+install.packages(dplyr)
+install.packages(tidyr)
+install.packages("ggplot2")
+library(ggplot2)
+library("readr")
+library(dplyr)
+library(tidyr)
+
+data = read.csv("C:\\Users\\hazem\\OneDrive\\Documents\\twitter_training.csv\\twitter_training.csv")
+
+# Cleaning the data
+
+colnames(data) = c("Tweet ID", "entity", "sentiment", "Tweet content")
+
+data <- data[data$sentiment != "Irrelevant", ]
+
+data <- data[!duplicated(data$`Tweet ID`), ]
+
+
+# Visualization
+
+sentiment_counts <- data %>%
+  group_by(entity, sentiment) %>%
+  summarise(count = n())
+
+
+ggplot(sentiment_counts, aes(x = entity, y = count, fill = sentiment)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Sentiment Analysis", x = "Entity", y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_manual(values = c("Positive" = "green", "Negative" = "red", "Neutral" = "blue"))
