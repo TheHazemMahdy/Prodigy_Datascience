@@ -1,0 +1,46 @@
+install.packages("readxl")
+install.packages("dplyr")
+install.packages("tidyr")
+install.packages("ggplot2")
+install.packages("flexdashboard")
+library(flexdashboard)
+library("ggplot2")
+library("tidyr")
+library("dplyr")
+library("readxl")
+
+data = read.csv("C:\\Users\\hazem\\OneDrive\\Documents\\titanic\\train.csv")
+
+# Data cleaning
+
+data = distinct(data)
+data_for_age = na.omit(data)
+
+# Visualization
+
+ggplot(data, aes(x = Sex, fill = factor(Survived))) +
+  geom_bar(position = "dodge") +
+  labs(title = "Survival by Gender",
+       x = "Gender",
+       y = "Count",
+       fill = "Survived") +
+  scale_fill_manual(values = c("0" = "red", "1" = "green"),
+                    labels = c("0" = "Not Survived", "1" = "Survived"))
+
+
+
+ggplot(data_for_age, aes(x = factor(Survived), y = Age, fill = factor(Survived))) +
+  geom_boxplot() +
+  labs(title = "Survival by Age",
+       x = "Survived",
+       y = "Age",
+       fill = "Survived") +
+  scale_fill_manual(values = c("0" = "red", "1" = "green"),
+                    labels = c("0" = "Not Survived", "1" = "Survived"))
+
+
+
+
+# Insights:
+# 1) Number of males not survived is much higher than females
+# 2) the Average survival age is the same as non survival around 30 years
